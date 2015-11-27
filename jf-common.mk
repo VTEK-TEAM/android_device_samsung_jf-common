@@ -54,10 +54,6 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/com.nxp.mifare.xml:system/etc/permissions/com.nxp.mifare.xml \
     frameworks/native/data/etc/handheld_core_hardware.xml:system/etc/permissions/handheld_core_hardware.xml
 
-# System Properties
-PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
-    persist.sys.usb.config=mtp
-
 # Device uses high-density artwork where available
 PRODUCT_AAPT_CONFIG := normal
 PRODUCT_AAPT_PREF_CONFIG := xxhdpi
@@ -69,6 +65,10 @@ TARGET_SCREEN_WIDTH := 1080
 $(call inherit-product, frameworks/native/build/phone-xxhdpi-2048-dalvik-heap.mk)
 
 $(call inherit-product-if-exists, frameworks/native/build/phone-xxhdpi-2048-hwui-memory.mk)
+
+# Art
+PRODUCT_PROPERTY_OVERRIDES += \
+    dalvik.vm.dex2oat-swap=false
 
 # Audio
 PRODUCT_PACKAGES += \
@@ -110,13 +110,10 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     SamsungDoze
 
-# GPS
-PRODUCT_PACKAGES += \
-    gps.msm8960
-
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/gps/etc/gps.conf:/system/etc/gps.conf \
-    $(LOCAL_PATH)/gps/etc/sap.conf:/system/etc/sap.conf
+    $(LOCAL_PATH)/configs/gps.conf:/system/etc/gps.conf \
+    $(LOCAL_PATH)/configs/sap.conf:/system/etc/sap.conf \
+    $(LOCAL_PATH)/configs/izat.conf:/system/etc/izat.conf
 
 # IPv6 tethering
 PRODUCT_PACKAGES += \
@@ -168,6 +165,7 @@ PRODUCT_COPY_FILES += \
 # OMX
 PRODUCT_PACKAGES += \
     libdashplayer \
+    libOmxCore \
     libOmxVdec \
     libOmxVenc \
     libOmxAacEnc \
@@ -195,10 +193,9 @@ PRODUCT_PACKAGES += \
     init.target.rc \
     ueventd.qcom.rc
 
-# Thermal
-PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/configs/thermal-engine.conf:system/etc/thermal-engine.conf \
-    $(LOCAL_PATH)/configs/thermal-engine-8064ab.conf:system/etc/thermal-engine-8064ab.conf
+# Samsung symbols
+PRODUCT_PACKAGES += \
+    libsamsung_symbols
 
 # USB
 PRODUCT_PACKAGES += \
@@ -243,6 +240,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_PROPERTY_OVERRIDES += \
     persist.data.ds_fmc_app.mode=0 \
     persist.data_netmgrd_nint=16 \
+    persist.data.qmi.adb_logmask=0 \
     persist.omh.enabled=1 \
     persist.radio.add_power_save=1 \
     persist.radio.fill_eons=1 \
@@ -277,7 +275,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
 # qualcomm
 PRODUCT_PROPERTY_OVERRIDES += \
     persist.timed.enable=true \
-    ro.vendor.extension_library=/system/lib/libqc-opt.so
+    ro.vendor.extension_library=libqti-perfd-client.so
 
 # recovery
 PRODUCT_PROPERTY_OVERRIDES += \

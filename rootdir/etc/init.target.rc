@@ -55,6 +55,7 @@ on boot
 
 on post-fs-data
     mkdir /data/tombstones 0771 system system
+    mkdir /data/qcks 0771 system system
     mkdir /tombstones/modem 0771 system system
     mkdir /tombstones/lpass 0771 system system
     mkdir /tombstones/wcnss 0771 system system
@@ -279,15 +280,10 @@ service qcamerasvr /system/bin/mm-qcamera-daemon
     user camera
     group camera system inet input graphics net_bt_stack
 
-service thermal-engine /system/bin/thermal-engine
-    class main
-    user root
-    group root
-
 service mpdecision /system/bin/mpdecision --avg_comp
+    class late_start
     user root
-    group root system
-    disabled
+    group system
 
 service kickstart /system/bin/qcks -i /firmware-mdm/image/
     user root
@@ -307,7 +303,6 @@ service qseecomd /system/bin/qseecomd
 
 # Start kickstart if mdm is detected
 on property:ro.baseband=mdm
-    mkdir /data/qcks 0770 system system
     start kickstart
 
 # Start up mdm_helper if sglte detected

@@ -64,19 +64,18 @@ public class jflteRIL extends RIL implements CommandsInterface {
     private Object mSMSLock = new Object();
     private boolean mIsSendingSMS = false;
     protected boolean isGSM = false;
+    private static final int RIL_REQUEST_DIAL_EMERGENCY = 10001;
     public static final long SEND_SMS_TIMEOUT_IN_MS = 30000;
-    private boolean samsungEmergency = needsOldRilFeature("samsungEMSReq");
 
-    public jflteRIL(Context context, int preferredNetworkType,
-            int cdmaSubscription, Integer instanceId) {
-        super(context, preferredNetworkType, cdmaSubscription, instanceId);
+    public jflteRIL(Context context, int networkModes, int cdmaSubscription) {
+        this(context, networkModes, cdmaSubscription, null);
         mAudioManager = (AudioManager)mContext.getSystemService(Context.AUDIO_SERVICE);
         mQANElements = SystemProperties.getInt("ro.ril.telephony.mqanelements", 4);
     }
 
-    public jflteRIL(Context context, int networkMode,
-            int cdmaSubscription) {
-        super(context, networkMode, cdmaSubscription);
+    public jflteRIL(Context context, int preferredNetworkType,
+            int cdmaSubscription, Integer instanceId) {
+        super(context, preferredNetworkType, cdmaSubscription, instanceId);
         mAudioManager = (AudioManager)mContext.getSystemService(Context.AUDIO_SERVICE);
         mQANElements = SystemProperties.getInt("ro.ril.telephony.mqanelements", 4);
     }
@@ -219,7 +218,6 @@ public class jflteRIL extends RIL implements CommandsInterface {
     protected Object
     responseCallList(Parcel p) {
         int num;
-        int voiceSettings;
         ArrayList<DriverCall> response;
         DriverCall dc;
 
@@ -235,29 +233,26 @@ public class jflteRIL extends RIL implements CommandsInterface {
             dc = new DriverCall();
 
             dc.state = DriverCall.stateFromCLCC(p.readInt());
-            dc.index = p.readInt() & 0xff;
+            dc.index = p.readInt();
             dc.TOA = p.readInt();
             dc.isMpty = (0 != p.readInt());
             dc.isMT = (0 != p.readInt());
             dc.als = p.readInt();
-            voiceSettings = p.readInt();
-            if (isGSM){
-                p.readInt();
-            }
-            dc.isVoice = (0 == voiceSettings) ? false : true;
-            dc.isVoicePrivacy = (0 != p.readInt());
-            if (isGSM) {
+            dc.isVoice = (0 != p.readInt());
+            if (!isGSM) {
                 p.readInt();
                 p.readInt();
                 p.readString();
             }
+            dc.isVoicePrivacy = (0 != p.readInt());
             dc.number = p.readString();
-            int np = p.readInt();
-            dc.numberPresentation = DriverCall.presentationFromCLIP(np);
+            dc.numberPresentation = DriverCall.presentationFromCLIP(p.readInt());
             dc.name = p.readString();
-            dc.namePresentation = p.readInt();
-            int uusInfoPresent = p.readInt();
-            if (uusInfoPresent == 1) {
+            if (isGSM)
+                dc.namePresentation = DriverCall.presentationFromCLIP(p.readInt());
+            else
+                dc.namePresentation = p.readInt();
+            if (p.readInt() == 1) { // uusInfoPresent
                 dc.uusInfo = new UUSInfo();
                 dc.uusInfo.setType(p.readInt());
                 dc.uusInfo.setDcs(p.readInt());
@@ -341,6 +336,10 @@ public class jflteRIL extends RIL implements CommandsInterface {
                 ret = responseInts(p);
                 setWbAmr(((int[])ret)[0]);
                 break;
+            case 11055: // RIL_UNSOL_ON_SS:
+                p.setDataPosition(dataPosition);
+                p.writeInt(RIL_UNSOL_ON_SS);
+                // Do not break
             default:
                 // Rewind the Parcel
                 p.setDataPosition(dataPosition);
@@ -350,6 +349,19 @@ public class jflteRIL extends RIL implements CommandsInterface {
                 return;
         }
 
+    }
+
+    @Override
+    public void
+    acceptCall (Message result) {
+        RILRequest rr = RILRequest.obtain(RIL_REQUEST_ANSWER, result);
+
+        rr.mParcel.writeInt(1);
+        rr.mParcel.writeInt(0);
+
+        if (RILJ_LOGD) riljLog(rr.serialString() + "> " + requestToString(rr.mRequest));
+
+        send(rr);
     }
 
     @Override
@@ -543,7 +555,7 @@ public class jflteRIL extends RIL implements CommandsInterface {
     @Override
     public void
     dial(String address, int clirMode, UUSInfo uusInfo, Message result) {
-        if (samsungEmergency && PhoneNumberUtils.isEmergencyNumber(address)) {
+        if (PhoneNumberUtils.isEmergencyNumber(address)) {
             dialEmergencyCall(address, clirMode, result);
             return;
         }
@@ -615,7 +627,6 @@ public class jflteRIL extends RIL implements CommandsInterface {
         }
     }
 
-    static final int RIL_REQUEST_DIAL_EMERGENCY = 10016;
    private void
     dialEmergencyCall(String address, int clirMode, Message result) {
         RILRequest rr;
