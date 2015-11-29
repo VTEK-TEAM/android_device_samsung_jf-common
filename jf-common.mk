@@ -150,11 +150,20 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/media_profiles.xml:system/etc/media_profiles.xml
 
 # NFC packages
+#PRODUCT_COPY_FILES += \
+#    frameworks/native/data/etc/android.hardware.nfc.hce.xml:system/etc/permissions/#android.hardware.nfc.hce.xml
+
+#PRODUCT_PACKAGES += \
+#    libnfc-nci \
+#    libnfc_nci_jni \
+#    nfc_nci.bcm2079x.msm8960 \
+#    NfcNci \
+#    Tag \
+#    com.android.nfc_extras
+
+# Sony NFC packages
 PRODUCT_PACKAGES += \
-    libnfc-nci \
-    libnfc_nci_jni \
-    nfc_nci.bcm2079x.msm8960 \
-    NfcNci \
+    NfcSony \
     Tag \
     com.android.nfc_extras
 
@@ -186,6 +195,7 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     fstab.qcom \
     init.carrier.rc \
+    felica_init.sh \
     init.crda.sh \
     init.qcom.rc \
     init.qcom.power.rc \
