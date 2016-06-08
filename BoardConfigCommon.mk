@@ -27,7 +27,9 @@ COMMON_PATH := device/samsung/jf-common
 
 # Platform
 TARGET_BOARD_PLATFORM := msm8960
+ifneq ($(TARGET_RECOVERY),twrp)
 USE_CLANG_PLATFORM_BUILD := true
+endif
 
 # Architecture
 TARGET_CPU_VARIANT := krait
@@ -143,6 +145,9 @@ WIFI_DRIVER_FW_PATH_STA := "/system/etc/wifi/bcmdhd_sta.bin"
 
 # TWRP
 ifeq ($(TARGET_RECOVERY),twrp)
+FLASHABLE_RECOVERYIMAGE_TARGET=twrp-$(TWRP_VERSION)-$(TARGET_DEVICE)
+BOARD_RAMDISK_LZMA=true
+
 DEVICE_RESOLUTION := 1080x1920
 RECOVERY_GRAPHICS_USE_LINELENGTH := true
 RECOVERY_SDCARD_ON_DATA := true
