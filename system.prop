@@ -5,6 +5,7 @@ dalvik.vm.dex2oat-swap=false
 audio.offload.disable=1
 persist.audio.fluence.speaker=true
 persist.audio.fluence.voicecall=true
+qcom.hw.aac.encoder=true
 ro.qc.sdk.audio.fluencetype=fluence
 use.dedicated.device.for.voip=true
 use.voice.path.for.pcm.voip=true
@@ -27,6 +28,8 @@ ro.qc.sdk.izat.service_mask=0x0
 persist.gps.qc_nlp_in_use=0
 
 # Media
+media.stagefright.legacyencoder=true
+media.stagefright.less-secure=true
 mm.enable.smoothstreaming=true
 
 # NFC
@@ -46,6 +49,9 @@ persist.radio.fill_eons=1
 persist.radio.use_se_table_only=1
 ro.telephony.mms_data_profile=5
 ro.telephony.ril_class=jflteRIL
+
+# Storage
+ro.sys.sdcardfs=true
 
 # Time
 persist.timed.enable=true
