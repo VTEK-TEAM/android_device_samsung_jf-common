@@ -1,5 +1,0 @@
-type mfdp, domain;
-type mfdp_exec, exec_type, file_type;
-init_daemon_domain(mfdp)
-
-allow mfdp self:process execmem;
