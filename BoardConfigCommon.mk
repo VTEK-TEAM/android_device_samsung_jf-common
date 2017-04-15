@@ -1,4 +1,6 @@
+#
 # Copyright (C) 2009 The CyanogenMod Project
+# Copyright (C) 2017 The LineageOS Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -42,7 +44,8 @@ BOARD_KERNEL_CMDLINE := androidboot.hardware=qcom user_debug=31 zcache msm_rtb.f
 BOARD_KERNEL_BASE := 0x80200000
 BOARD_MKBOOTIMG_ARGS := --ramdisk_offset 0x02000000
 BOARD_KERNEL_PAGESIZE := 2048
-TARGET_KERNEL_CONFIG := cyanogenmod_jf_defconfig
+LZMA_RAMDISK_TARGETS := recovery
+TARGET_KERNEL_CONFIG := lineageos_jf_defconfig
 TARGET_KERNEL_SOURCE := kernel/samsung/jf
 TARGET_KERNEL_HAVE_EXFAT := true
 
@@ -86,8 +89,10 @@ USE_DEVICE_SPECIFIC_GPS := true
 TARGET_SPECIFIC_HEADER_PATH += $(COMMON_PATH)/include
 
 # Legacy Hacks
+BOARD_GLOBAL_CFLAGS += -DDECAY_TIME_DEFAULT=0
 MALLOC_SVELTE := true
 TARGET_HAS_LEGACY_CAMERA_HAL1 := true
+TARGET_NEEDS_GCC_LIBC := true
 TARGET_NEEDS_PLATFORM_TEXT_RELOCATIONS := true
 
 # NFC
@@ -112,7 +117,7 @@ TARGET_SYSTEM_PROP := $(COMMON_PATH)/system.prop
 BOARD_USES_QC_TIME_SERVICES := true
 
 # Recovery
-TARGET_RECOVERY_DENSITY := hdpi
+TARGET_RECOVERY_DENSITY := xhdpi
 TARGET_RECOVERY_FSTAB := $(COMMON_PATH)/rootdir/etc/fstab.qcom
 TARGET_USERIMAGES_USE_EXT4 := true
 TARGET_USERIMAGES_USE_F2FS := true
