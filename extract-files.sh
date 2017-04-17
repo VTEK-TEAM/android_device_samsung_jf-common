@@ -57,6 +57,7 @@ extract "$MY_DIR"/common-proprietary-files.txt "$SRC"
 if [ "$DEVICE" == "jflteatt" ] ||
 		[ "$DEVICE" == "jfltecan" ] ||
 		[ "$DEVICE" == "jfltetmo" ] ||
+		[ "$DEVICE" == "jfltedcm" ] ||
 		[ "$DEVICE" == "jfltexx" ]; then
     export BLOB_LOC=jf-gsm-common
 else
